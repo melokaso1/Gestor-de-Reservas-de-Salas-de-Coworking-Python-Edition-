@@ -1,22 +1,23 @@
 from sqlmodel import SQLModel, Field
-from typing import Optional, List
+from typing import Optional
 
 class Room(SQLModel, table=True):
-    id_room: Optional[int] = Field(default=None, primary_key=True)
+    __tablename__ = "salas"
+    id_sala: Optional[int] = Field(default=None, primary_key=True)
     nombre: str
-    sede: str
     capacidad: int
-    recursos: str  # Lista de recursos como string, e.g., "pizarra,proyector"
+    descripcion: str
+    precio: float
 
 class RoomCreate(SQLModel):
     nombre: str
-    sede: str
     capacidad: int
-    recursos: str
+    descripcion: str
+    precio: float
 
 class RoomRead(SQLModel):
-    id_room: int
+    id_sala: int
     nombre: str
-    sede: str
     capacidad: int
-    recursos: str
+    descripcion: str
+    precio: float

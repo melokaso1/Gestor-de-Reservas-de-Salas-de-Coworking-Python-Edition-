@@ -9,10 +9,10 @@ oauth2 = OAuth2PasswordBearer(tokenUrl="login")
 def get_current_user(token: str = Depends(oauth2)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("username")
+        email = payload.get("username")
         rol = payload.get("rol")
-        if username is None or rol is None:
+        if email is None or rol is None:
             raise HTTPException(status_code=401, detail="Credenciales inválidas")
-        return {"username": username, "rol": rol}
+        return {"email": email, "rol": rol}
     except JWTError:
         raise HTTPException(status_code=401, detail="Credenciales inválidas")

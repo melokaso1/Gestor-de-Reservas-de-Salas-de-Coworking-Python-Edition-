@@ -1,9 +1,9 @@
-from sqlmodel import Session
+from sqlmodel import Session, select
 from fastapi import HTTPException
 from ...models.usuario.user import Usuarios
 
 def create_user(db: Session, user: Usuarios):
-    if not all ([user.id_user, user.nombre, user.email, user.contraseña]):
+    if not all ([user.nombre, user.email, user.contraseña]):
         raise HTTPException(status_code=400, detail="❌Faltan datos obligatorios.")
     db.add(user)
     db.commit()
@@ -11,9 +11,9 @@ def create_user(db: Session, user: Usuarios):
     return user
 
 def get_user(db: Session):
-    return db.query(Usuarios).all()
-
-from sqlmodel import select
+    statement = select(Usuarios)
+    result = db.exec(statement)
+    return result.all()
 
 def get_user_by_id(db: Session, user_id: int):
     statement = select(Usuarios).where(Usuarios.id_user == user_id)

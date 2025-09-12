@@ -1,4 +1,5 @@
 from sqlmodel import SQLModel, Field
+from pydantic import BaseModel
 from typing import Optional
 from enum import Enum
 
@@ -16,8 +17,8 @@ class Usuarios(SQLModel, table=True):
 class UsuarioCreate(SQLModel):
     nombre: str
     email: str
-    rol: RolEnum = Field(default=RolEnum.user)
-    contraseña: str
+    rol: Optional[str] = "User"
+    password: str
 
 class UsuarioRead(SQLModel):
     id_user: int

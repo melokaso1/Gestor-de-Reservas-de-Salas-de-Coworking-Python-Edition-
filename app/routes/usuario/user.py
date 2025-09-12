@@ -2,7 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from ...auth.autenticar_contraseña import hash_contraseña, verificar_contraseña
 from ...auth.jwt_hand import crear_token
-from ...models.usuario.user import Usuarios, UsuarioCreate
+from ...models.usuario.user import Usuarios, UsuarioCreate, RolEnum
+from pydantic import BaseModel, Field
+from typing import Optional
+
+class UserCreateSchema(BaseModel):
+    nombre: str = Field(..., example="Juan Perez")
+    email: str = Field(..., example="juan@example.com")
+    rol: str = Field("User", example="User")
+    password: str = Field(..., example="password123")
 from ..verificar.verifcar_admin import admin_required
 from sqlmodel import Session, select
 from ...models.database.database import get_session
@@ -11,27 +19,41 @@ from ...auth.dependencias import get_current_user
 
 router = APIRouter(prefix="/usuario", tags=["Usuarios"])
 
+@router.post("/test")
+def test_endpoint():
+    return {"message": "Test endpoint works"}
+
+@router.post("/test_user")
+def test_user_endpoint(user: UserCreateSchema):
+    return {"received": user.dict()}
+
 @router.post("/registro_usuario")
-def registrar_usuario(user: UsuarioCreate, db: Session = Depends(get_session)):
+def registrar_usuario(user: UserCreateSchema, db: Session = Depends(get_session)):
     aparece =  select(Usuarios).where(Usuarios.email == user.email)
-    
+
     resultado = db.exec(aparece).first()
-    
+
     if resultado:
         raise HTTPException(status_code=400, detail="❌El email ya está registrado.")
-    user.contraseña = hash_contraseña(user.contraseña)
-    
+    hashed_password = hash_contraseña(user.password)
+
+    # Convertir rol string a RolEnum
+    if user.rol == "Admin":
+        rol = RolEnum.admin
+    else:
+        rol = RolEnum.user
+
     new_user = Usuarios(
         nombre = user.nombre,
         email = user.email,
-        rol = user.rol,
-        contraseña = user.contraseña 
+        rol = rol,
+        contraseña = hashed_password
     )
-    
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    
+
     return new_user
 
 @router.post("/login")
@@ -40,7 +62,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     if not usuario or not verificar_contraseña(form_data.password, usuario.contraseña):
         raise HTTPException(status_code=401, detail="❌Credenciales inválidas.")
     
-    token = crear_token({"username": usuario.email, "rol": usuario.rol})
+    token = crear_token({"username": usuario.email, "rol": usuario.rol.value})
     return {"access_token": token, "token_type": "bearer"}
 
 @router.get("/usuario_actual")
