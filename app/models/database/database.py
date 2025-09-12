@@ -10,7 +10,7 @@ NAME = os.getenv("DB_NAME")
 USER = os.getenv("DB_USER")
 PASSWORD = os.getenv("DB_PASSWORD")
 
-if not all([HOST, PORT, NAME, USER, PASSWORD]):
+if not all([HOST, PORT, NAME, USER]):
     raise ValueError("❌Las variables de entorno de la base de datos no están configuradas.")
 
 DATABASE_URL = f"mysql+mysqlconnector://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}"
