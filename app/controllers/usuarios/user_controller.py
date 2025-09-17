@@ -1,6 +1,7 @@
 from sqlmodel import Session, select
 from fastapi import HTTPException
-from ...models.usuario.user import Usuarios
+from app.models.usuario.user import Usuarios
+from sqlalchemy import func
 
 def create_user(db: Session, user: Usuarios):
     if not all ([user.nombre, user.email, user.contraseña]):
@@ -20,6 +21,11 @@ def get_user_by_id(db: Session, user_id: int):
     result = db.exec(statement)
     return result.first()
 
+def get_user_by_email(db: Session, email: str):
+    statement = select(Usuarios).where(func.lower(Usuarios.email) == func.lower(email))
+    result = db.exec(statement)
+    return result.first()
+
 def delete_user(db: Session, user_id: int):
     statement = select(Usuarios).where(Usuarios.id_user == user_id)
     result = db.exec(statement)
@@ -31,5 +37,3 @@ def delete_user(db: Session, user_id: int):
     db.delete(user)
     db.commit()
     return user
-
-

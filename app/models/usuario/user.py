@@ -4,20 +4,20 @@ from typing import Optional
 from enum import Enum
 
 class RolEnum(str, Enum):
-    admin = "Admin"
-    user = "User"
+    Admin = "Admin"
+    User = "User"
 
 class Usuarios(SQLModel, table=True):
     id_user: Optional[int] = Field(default=None, primary_key=True)
     nombre: str
     email: str
-    rol: RolEnum = Field(default=RolEnum.user)
+    rol: RolEnum = Field(default=RolEnum.User)
     contraseña: str
     
 class UsuarioCreate(SQLModel):
     nombre: str
     email: str
-    rol: Optional[str] = "User"
+    rol: str = "User"
     password: str
 
 class UsuarioRead(SQLModel):

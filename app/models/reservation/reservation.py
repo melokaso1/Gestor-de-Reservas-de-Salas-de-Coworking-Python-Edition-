@@ -4,12 +4,12 @@ from datetime import date, time
 from enum import Enum
 
 class EstadoEnum(str, Enum):
-    pendiente = "Pendiente"
-    confirmada = "Confirmada"
-    cancelada = "Cancelada"
+    Pendiente = "Pendiente"
+    Confirmada = "Confirmada"
+    Cancelada = "Cancelada"
 
 class Horario(SQLModel, table=True):
-    __tablename__: str = "horarios"
+    __tablename__: str = "horario"
     id_horario: Optional[int] = Field(default=None, primary_key=True)
     hora_inicio: time
     hora_fin: time
@@ -19,8 +19,9 @@ class Reservation(SQLModel, table=True):
     __tablename__: str = "reservaciones"
     id_reservaciones: Optional[int] = Field(default=None, primary_key=True)
     fecha: date
-    estado: EstadoEnum = Field(default=EstadoEnum.pendiente)
-    horario_id: int = Field(foreign_key="horarios.id_horario")
+    estado: EstadoEnum = Field(default=EstadoEnum.Pendiente)
+    horario_id: int = Field(foreign_key="horario.id_horario")
+    sede_id: int = Field(foreign_key="sedes.id_sede")
     usuarios_reservaciones: List["UsuarioReservacion"] = Relationship(back_populates="reservacion")
     salas_reservaciones: List["SalasReservacion"] = Relationship(back_populates="reservacion")
 
@@ -37,6 +38,7 @@ class SalasReservacion(SQLModel, table=True):
     reservacion: Optional[Reservation] = Relationship(back_populates="salas_reservaciones")
 
 class ReservationCreate(SQLModel):
+    sede_id: int
     sala_id: int
     fecha: date
     hora_inicio: str
@@ -47,3 +49,4 @@ class ReservationRead(SQLModel):
     fecha: date
     estado: EstadoEnum
     horario_id: int
+    sede_id: int
