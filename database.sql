@@ -75,6 +75,8 @@ CREATE TABLE salas_reservaciones (
 
 -- Inserts iniciales para horarios
 INSERT INTO horario (hora_inicio, hora_fin, disponible) VALUES
+('06:00:00', '07:00:00', TRUE),
+('07:00:00', '08:00:00', TRUE),
 ('08:00:00', '09:00:00', TRUE),
 ('09:00:00', '10:00:00', TRUE),
 ('10:00:00', '11:00:00', TRUE),
